@@ -26,8 +26,6 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     image = models.ImageField(upload_to='uploads/images')
     created_at = models.DateField(auto_now_add=True)
-    seller = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='products', on_delete=models.CASCADE, null=True)
-    category = models.CharField(max_length=30, default='Uncategorized')
     quantity = models.PositiveIntegerField(default=0)
     rating = models.PositiveSmallIntegerField(default=0)
 
@@ -36,15 +34,3 @@ class Product(models.Model):
 
     class Meta:
         db_table = 'products'
-
-class Orders(models.Model):
-    date = models.DateTimeField(auto_now_add=True)
-    products = ArrayField(models.CharField(max_length=50), default=list)
-    quantities = ArrayField(models.PositiveIntegerField(), default=list)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    delivery_method = models.CharField(max_length=30, default='')
-    payment_method = models.CharField(max_length=30, default='')
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='orders', on_delete=models.CASCADE)
-
-    class Meta:
-        db_table = 'orders'

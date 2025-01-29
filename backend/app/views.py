@@ -1,12 +1,11 @@
 from rest_framework import viewsets, permissions, generics, status # type: ignore
 from rest_framework.response import Response # type: ignore
-from rest_framework.decorators import api_view # type: ignore
+from rest_framework.decorators import api_view, authentication_classes, permission_classes # type: ignore
 from django.http import JsonResponse
 from .models import Product, CustomUser
 from rest_framework.permissions import IsAuthenticated # type: ignore
 from .serializers import ProductSerializer, CustomUserSerializer
 from .permissions import IsOwnerOrReadOnly
-from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.views import TokenObtainPairView # type: ignore
 from .serializers import CustomTokenObtainPairSerializer
@@ -16,6 +15,11 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from rest_framework.generics import RetrieveUpdateAPIView
 
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
+
+from rest_framework_simplejwt.authentication import JWTAuthentication  
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
 
@@ -77,9 +81,15 @@ class updateUserprofileView(RetrieveUpdateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]  
 
     def get_object(self):
         return self.request.user
+
+    def perform_update(self, serializer):
+        if 'avatar' in self.request.FILES:
+            serializer.validated_data['avatar'] = self.request.FILES['avatar']
+        serializer.save()
 
 @api_view(['GET'])
 def search_products(request):
@@ -105,24 +115,19 @@ class SignUpView(generics.CreateAPIView):
         return user
 
 
-@login_required
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])  # Changed from TokenAuthentication
+@permission_classes([IsAuthenticated])
 def current_user(request):
-    try:
-        user = CustomUser.objects.filter(username=request.user.username).first()
-
-        if not user:
-            return JsonResponse({'error': 'User not found'}, status=404)
-
-        return JsonResponse({
+    if request.user.is_authenticated:
+        user = request.user
+        return Response({
             'id': user.id,
             'username': user.username,
             'email': user.email,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
+            'name': user.name,
+            'telephone_no': user.telephone_no,
             'bio': user.bio,
-            'avatar': user.avatar.url if user.avatar else '/media/cat.png',
+            'avatar': user.avatar.url if user.avatar else '/media/cat.png'  # Provide default
         })
-
-    except Exception as e:
-        print(f"Error fetching user: {e}")
-        return JsonResponse({'error': 'Something went wrong'}, status=500)
+    return Response({'detail': 'Not authenticated'}, status=401)

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'app.apps.AppConfig',
     'rest_framework', 
     'corsheaders',
+    'rest_framework.authtoken',
 
     'allauth',
     'allauth.account',
@@ -48,21 +49,22 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'allauth.account.middleware.AccountMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',  # SessionMiddleware must come before AuthenticationMiddleware
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',  # Keep allauth middleware last
 ]
 
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:3000",
+    "http://localhost:8000",  # Add this
+    "http://127.0.0.1:8000",  # Add this
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -86,9 +88,19 @@ JWT_AUTH = {
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',  # JWT Authentication
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.MultiPartParser',
     ),
 }
+
 
 
 

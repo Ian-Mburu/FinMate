@@ -41,16 +41,17 @@ class CustomUserSerializer(serializers.ModelSerializer):
         return user
 
     def update(self, instance, validated_data):
-        if 'password' in validated_data:
-            instance.set_password(validated_data.pop('password'))
-            return super().update(instance, validated_data)
-
+        password = validated_data.pop('password', None)
+        avatar = validated_data.pop('avatar', None)
+        
+        if password:
+            instance.set_password(password)
+        if avatar:
+            instance.avatar = avatar
+            
+        return super().update(instance, validated_data)
 
 class ProductSerializer(serializers.ModelSerializer):
-    seller_id = serializers.IntegerField(source='seller.id', read_only=True)
-    seller_username = serializers.CharField(source='seller.username', read_only=True)
-    seller_email = serializers.EmailField(source='seller.email', read_only=True)
-
     class Meta:
         model = Product
-        fields = ['id', 'title', 'description', 'price', 'image', 'created_at', 'category', 'quantity', 'rating', 'seller_id', 'seller_username', 'seller_email']
+        fields = '__all__'  #
