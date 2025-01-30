@@ -1,23 +1,18 @@
 from rest_framework import viewsets, permissions, generics, status # type: ignore
 from rest_framework.response import Response # type: ignore
-from rest_framework.decorators import api_view, authentication_classes, permission_classes # type: ignore
+from rest_framework.decorators import api_view, authentication_classes, permission_classes, action # type: ignore
 from django.http import JsonResponse
-from .models import Product, CustomUser
+from .models import Product, CustomUser, Wishlist, Cart, Order
 from rest_framework.permissions import IsAuthenticated # type: ignore
-from .serializers import ProductSerializer, CustomUserSerializer
+from .serializers import ProductSerializer, CustomUserSerializer, CartSerializer, WishlistSerializer, OrderSerializer 
 from .permissions import IsOwnerOrReadOnly
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.views import TokenObtainPairView # type: ignore
 from .serializers import CustomTokenObtainPairSerializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer # type: ignore
 from django.contrib import messages
-
-from django.contrib.auth.decorators import login_required
 from rest_framework.generics import RetrieveUpdateAPIView
-
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import TokenAuthentication
-
 from rest_framework_simplejwt.authentication import JWTAuthentication  
 from rest_framework.parsers import MultiPartParser, FormParser
 
@@ -131,3 +126,92 @@ def current_user(request):
             'avatar': user.avatar.url if user.avatar else '/media/cat.png'  # Provide default
         })
     return Response({'detail': 'Not authenticated'}, status=401)
+
+
+# views.py
+class CartViewSet(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Cart.objects.filter(user=self.request.user)
+
+    @action(detail=False, methods=['post'])
+    def add_item(self, request):
+        serializer = CartAddItemSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                product = Product.objects.get(id=serializer.validated_data['product_id'])
+            except Product.DoesNotExist:
+                return Response(
+                    {"error": "Product not found"}, 
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            cart, _ = Cart.objects.get_or_create(user=request.user)
+            cart_item, created = CartItem.objects.get_or_create(
+                cart=cart,
+                product=product,
+                defaults={'quantity': serializer.validated_data['quantity']}
+            )
+
+            if not created:
+                cart_item.quantity += serializer.validated_data['quantity']
+                cart_item.save()
+
+            return Response(
+                CartSerializer(cart, context={'request': request}).data,
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# views.py
+class WishlistViewSet(viewsets.ModelViewSet):
+    serializer_class = WishlistSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Wishlist.objects.filter(user=self.request.user)
+
+    @action(detail=False, methods=['post'])
+    def add_product(self, request):
+        try:
+            product_id = request.data.get('product_id')
+            if not product_id:
+                return Response(
+                    {"error": "product_id is required"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            product = Product.objects.get(id=product_id)
+            wishlist, _ = Wishlist.objects.get_or_create(user=request.user)
+            
+            if wishlist.products.filter(id=product.id).exists():
+                return Response(
+                    {"error": "Product already in wishlist"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            wishlist.products.add(product)
+            return Response(
+                WishlistSerializer(wishlist, context={'request': request}).data,
+                status=status.HTTP_201_CREATED
+            )
+
+        except Product.DoesNotExist:
+            return Response(
+                {"error": "Product not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+)
+
+class OrderViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
