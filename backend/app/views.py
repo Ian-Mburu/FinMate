@@ -2,9 +2,9 @@ from rest_framework import viewsets, permissions, generics, status # type: ignor
 from rest_framework.response import Response # type: ignore
 from rest_framework.decorators import api_view, authentication_classes, permission_classes, action # type: ignore
 from django.http import JsonResponse
-from .models import Product, CustomUser, Wishlist, Cart, Order
+from .models import Product, CustomUser, Wishlist, Cart, CartItem, Order
 from rest_framework.permissions import IsAuthenticated # type: ignore
-from .serializers import ProductSerializer, CustomUserSerializer, CartSerializer, WishlistSerializer, OrderSerializer 
+from .serializers import ProductSerializer, CustomUserSerializer, CartSerializer,CartAddItemSerializer, WishlistSerializer, OrderSerializer 
 from .permissions import IsOwnerOrReadOnly
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.views import TokenObtainPairView # type: ignore
@@ -135,6 +135,15 @@ class CartViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Cart.objects.filter(user=self.request.user)
+    
+    @action(detail=True, methods=['delete'])
+    def items(self, request, pk=None):
+        try:
+            item = CartItem.objects.get(id=pk)
+            item.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except CartItem.DoesNotExist:
+            return Response({"error": "Item not found"}, status=status.HTTP_404_NOT_FOUND)
 
     @action(detail=False, methods=['post'])
     def add_item(self, request):
@@ -172,6 +181,16 @@ class WishlistViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Wishlist.objects.filter(user=self.request.user)
+    
+    @action(detail=False, methods=['delete'])
+    def remove_product(self, request, pk=None):
+        try:
+            product = Product.objects.get(id=pk)
+            wishlist = Wishlist.objects.get(user=request.user)
+            wishlist.products.remove(product)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Product.DoesNotExist:
+            return Response({"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
 
     @action(detail=False, methods=['post'])
     def add_product(self, request):

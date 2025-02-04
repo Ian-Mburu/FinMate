@@ -57,13 +57,13 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = '__all__'  #
 
 class CartItemSerializer(serializers.ModelSerializer):
-    product = serializers.StringRelatedField()
+    product = ProductSerializer
     total_price = serializers.SerializerMethodField()
 
     class Meta:
         model = CartItem
         fields = ['id', 'product', 'quantity', 'total_price']
-        read_only_fields = ['id', 'product', 'total_price']
+        read_only_fields = ['id', 'total_price']
 
     def get_total_price(self, obj):
         return obj.total_price
@@ -79,6 +79,14 @@ class CartSerializer(serializers.ModelSerializer):
 
     def get_total_price(self, obj):
         return obj.total_price
+    
+class CartAddItemSerializer(serializers.ModelSerializer):
+    product_id = serializers.IntegerField()
+
+    class Meta:
+        model = CartItem
+        fields = ['product_id', 'quantity']
+        extra_kwargs = {'quantity': {'min_value': 1}}
 
 class WishlistSerializer(serializers.ModelSerializer):
     products = ProductSerializer(many=True, read_only=True)
