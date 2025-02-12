@@ -7,39 +7,62 @@ import '../styles/pages/wishlist.css';
 const WishlistPage = () => {
     const [wishlist, setWishlist] = useState([]);
     const [loading, setLoading] = useState(true);
-    const { user, logout } = useAuth();
+    const { user, loading: authLoading, logout } = useAuth();
     const navigate = useNavigate();
 
-    // WishlistPage.jsx
-useEffect(() => {
-    const fetchWishlist = async () => {
-        try {
-            const response = await axios.get('/api/wishlist/', {
-                headers: { Authorization: `Bearer ${user.access}` }
-            });
-            // Verify response structure
-            console.log('Wishlist API response:', response.data);
-            setWishlist(response.data?.products || []);
-            setLoading(false);
-        } catch (error) {
-            console.error('Wishlist fetch error:', error);
-            if (error.response?.status === 401) {
-                logout();
+    useEffect(() => {
+        const fetchWishlist = async () => {
+            try {
+                console.log("Fetching wishlist with token:", user.accessToken); // Debug log
+                const response = await axios.get('http://localhost:8000/api/wishlist/mine/', {
+                    headers: { 
+                        Authorization: `Bearer ${user.accessToken}`
+                    }
+                });
+                
+                const wishlistData = response.data?.products || [];
+                setWishlist(wishlistData);
+                setLoading(false);
+            } catch (error) {
+                console.error('Wishlist fetch error:', error);
+                if (error.response?.status === 401) {
+                    console.log("Unauthorized access, logging out..."); // Debug log
+                    logout();
+                }
+                setLoading(false);
+            }
+        };
+    
+        if (!authLoading) {
+            if (user?.accessToken) {
+                fetchWishlist();
+            } else {
+                console.log("User  not authenticated, redirecting to login..."); // Debug log
                 navigate('/login');
             }
-            setLoading(false);
         }
-    };
+    }, [user, authLoading, navigate, logout]);
 
-    if (user) fetchWishlist();
-}, [user]);
+    if (authLoading) return <div className="loading">Checking authentication...</div>;
+    if (loading) return <div className="loading">Loading wishlist...</div>;
+
 
     const removeFromWishlist = async (productId) => {
         try {
-            await axios.delete(`/api/wishlist/remove_product/${productId}/`, {
-                headers: { Authorization: `Bearer ${user.access}` }
+            await axios.delete(`http://localhost:8000/api/wishlist/remove_product/${productId}/`, {
+                headers: { 
+                    Authorization: `Bearer ${user.accessToken}`,
+                    'Content-Type': 'application/json'
+                }
             });
-            setWishlist(wishlist.filter(product => product.id !== productId));
+            
+            // Refresh the wishlist after removal
+            const response = await axios.get('http://localhost:8000/api/wishlist/mine/', {
+                headers: { 
+                    Authorization: `Bearer ${user.accessToken}`
+                }
+            });
+            setWishlist(response.data?.products || []);
         } catch (error) {
             console.error('Remove from wishlist failed:', error);
         }

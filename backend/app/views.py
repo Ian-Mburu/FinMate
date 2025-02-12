@@ -194,6 +194,14 @@ class WishlistViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Product.DoesNotExist:
             return Response({"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+    @action(detail=False, methods=['get'])
+    def mine(self, request):
+        wishlist = Wishlist.objects.filter(user=request.user).first()
+        if not wishlist:
+            return Response({"detail": "Wishlist not found"}, status=404)
+        serializer = self.get_serializer(wishlist)
+        return Response(serializer.data)
 
     @action(detail=False, methods=['post'])
     def add_product(self, request):

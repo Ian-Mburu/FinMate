@@ -29,6 +29,7 @@ urlpatterns = [
     path('api/checkout/', CartViewSet.as_view({'post': 'checkout'}), name='checkout'),
     path('api/cart/add_item/', CartViewSet.as_view({'post': 'add_item'}), name='cart-add-item'),
     path('api/wishlist/add_product/', WishlistViewSet.as_view({'post': 'add_product'}), name='wishlist-add-product'),
+    path('api/wishlist/add_product/', WishlistViewSet.as_view({'post': 'add_product'}), name='wishlist-add-product'),
     path('api/wishlist/remove_product/<int:pk>/', WishlistViewSet.as_view({'delete': 'remove_product'}), 
     name='wishlist-remove-product'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
