@@ -1,0 +1,112 @@
+.j {
+    display: flex;
+    flex-direction: row;
+    gap: 100px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 100px;
+}
+
+.prd-image2 {
+    width: auto;
+    height: 200px;
+    background: none;
+}
+
+.price {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background: #747070;
+    gap: 7px;
+    width: 200px;
+    padding: 0 10px;
+    font-size: 16px;
+    font-family: cursive;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.free {
+    font-size: 16px;
+    color: #ffffff;
+}
+
+.tp1 h2 {
+    font-size: 30px;
+    font-family: cursive;
+    font-weight: 600;
+}
+
+.description {
+    width: 500px;
+    font-size: 16px;
+    font-family: cursive;
+    font-weight: 600;
+    color: #747070;
+}
+
+p {
+    font-size: 16px;
+    font-family: cursive;
+    font-weight: 600px;
+    color: #747070;
+}
+
+.tp2 {
+    align-items: center;
+}
+
+.update-button {
+    background: #747070;
+    color: #ffffff;
+    padding: 7px 20px;
+    border: none;
+    color: #ffffff;
+    font-size: 16px;
+    font-family: cursive;
+    font-weight: 600;
+    margin: 0 20px 0 0;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.update-button:hover {
+    background: #4c4c4c;
+}
+
+.delete-button {
+    background: #747070;
+    color: #ffffff;
+    padding: 7px 20px;
+    border: none;
+    color: #ffffff;
+    font-size: 16px;
+    font-family: cursive;
+    font-weight: 600;
+    margin: 0 20px 0 0;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.delete-button:hover {
+    background: #ff0000;
+}
+
+.cart-btn {
+    background: #747070;
+    color: #ffffff;
+    padding: 7px 20px;
+    border: none;
+    color: #ffffff;
+    font-size: 16px;
+    font-family: cursive;
+    font-weight: 600;
+    margin: 50px 20px 0 0;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.cart-btn:hover {
+    background: #4c4c4c;
+}

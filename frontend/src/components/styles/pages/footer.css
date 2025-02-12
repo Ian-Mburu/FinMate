@@ -1,0 +1,55 @@
+
+.footer {
+    display: flex;
+    flex-direction: row;
+    gap: 100px;
+    align-items: center;
+    justify-content: center;
+    background: #575454;
+    margin: 70px -7px -20px -60px;
+}
+
+.shop a, .about a, .help a {
+    font-size: 16px;
+    font-family: cursive;
+    font-weight: lighter;
+}
+
+
+.shop a:hover, .about a:hover, .help a:hover {
+    color: #ece5e5;
+}
+
+h4 {
+    font-size: 20px;
+    font-family: cursive;
+    font-weight: 600;
+    color: #ece5e5;
+}
+
+.icons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    margin: 100px 0 0 1px;
+}
+
+.copyright {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 300px;
+    padding-top: 50px;
+    justify-content: center;
+    background: #575454;
+    margin: 0px -7px -20px -60px;
+}
+
+icons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    justify-content: center;
+}

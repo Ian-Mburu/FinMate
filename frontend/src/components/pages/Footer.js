@@ -1,0 +1,78 @@
+import React from 'react'
+import { FaFacebook, FaInstagram, FaShippingFast } from "react-icons/fa";
+import { FaRecycle } from "react-icons/fa";
+import { FaLock } from "react-icons/fa6";
+import { CiInstagram, CiTwitter } from "react-icons/ci";
+import { CiFacebook } from "react-icons/ci";
+import { CiLinkedin } from "react-icons/ci";
+import { FaXTwitter } from "react-icons/fa6";
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux'; // Adjust based on how you manage state
+import '../styles/pages/footer.css'
+import { FaRegCopyright } from "react-icons/fa6";
+import { FaPaypal } from "react-icons/fa6";
+import { FaCcStripe } from "react-icons/fa6";
+import { SiVisa } from "react-icons/si";
+
+
+
+
+const Footer = () => {
+  return (
+    <div>
+      <div className='footer'>
+        <div className='fin'>
+          <h4>FinMate</h4>
+          <p className='par-6'>We’re proud to support <br/> sustainable fashion. <br/> By choosing FinMate, <br/> you’re helping to <br/> reduce landfill waste <br/> and make eco-friendly <br/> choices <br/> without compromising style.</p>
+        </div>
+
+
+        <div className='shop'>
+          <h4>Shop</h4>
+          <a href='#'>Shop Men</a>
+          <a href='#'>Shop Women</a>
+          <a href='#'>LookBook</a>
+          <a href='#'>Gift Card</a>
+          <a href='#'>Sale</a>
+        </div>
+    
+        <div className='about'>
+        <h4>About</h4>
+          <a href='#'>Our Story</a>
+          <a href='#'>Our Materials</a>
+          <a href='#'>Our Value</a>
+          <a href='#'>Sustainability</a>
+          <a href='#'>Manufacture</a>
+        </div>
+
+        <div className='help'>
+        <h4>Need Help?</h4>
+          <a href='#'>FAQs</a>
+          <a href='#'>Shipping & Returns</a>
+          <a href='#'>Shoe Care</a>
+          <a href='#'>Size Chart</a>
+          <a href='#'>Contact Us</a>
+        </div>
+
+        <div className='icons'>
+        <a href='#'><FaInstagram /></a>
+        <a href='#'><FaFacebook /></a>
+        <a href='#'><CiLinkedin /></a>
+        <a href='#'><CiTwitter /></a>
+      </div>
+      </div>
+
+      <div className='copyright'>
+        <p><FaRegCopyright />  Recycled Shoe Store. Powered by Recycled Shoe Store. </p>
+        
+        <icons>
+          <FaCcStripe size={30} />
+          <FaPaypal size={30} />
+          <SiVisa size={30} />
+        </icons>
+      </div>
+    </div>
+  )
+}
+
+export default Footer
