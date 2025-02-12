@@ -5,18 +5,19 @@ from django.conf import settings
 
 
 class CustomUser(AbstractUser):
-    username = models.CharField(max_length=100, unique=True)
-    email = models.EmailField(unique=True)  # Ensure email is unique
-    name = models.CharField(max_length=200, unique=True)
-    bio = models.TextField(null=True)
-    avatar = models.ImageField(default="../media/cat.png", null=True)
-    telephone_no = models.CharField(max_length=15, null=True, blank=True) 
+    email = models.EmailField(unique=True)
+    # Remove duplicate name field if using AbstractUser's first_name/last_name
+    first_name = models.CharField(max_length=30, blank=True)
+    last_name = models.CharField(max_length=150, blank=True)
+    bio = models.TextField(null=True, blank=True)
+    avatar = models.ImageField(default="cat.png", upload_to='avatars/')
+    telephone_no = models.CharField(max_length=15, null=True, blank=True)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'name']  
+    REQUIRED_FIELDS = []
 
     def __str__(self):
-        return self.username
+        return self.email
 
 
 class Product(models.Model):

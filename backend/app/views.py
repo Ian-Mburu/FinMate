@@ -28,12 +28,18 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
         # Add custom claims
-        token['id'] = user.id
+        token['email'] = user.email
         return token
 
     def validate(self, attrs):
+        # Rename username field to email
+        attrs['username'] = attrs.get('email', attrs.get('username'))
         data = super().validate(attrs)
-        data['id'] = self.user.id  # Add the ID to the response
+        data.update({
+            'id': self.user.id,
+            'email': self.user.email,
+            'username': self.user.username
+        })
         return data
 
 
@@ -111,24 +117,21 @@ class SignUpView(generics.CreateAPIView):
 
 
 @api_view(['GET'])
-@authentication_classes([JWTAuthentication])  # Changed from TokenAuthentication
+@authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
 def current_user(request):
-    if request.user.is_authenticated:
-        user = request.user
-        return Response({
-            'id': user.id,
-            'username': user.username,
-            'email': user.email,
-            'name': user.name,
-            'telephone_no': user.telephone_no,
-            'bio': user.bio,
-            'avatar': user.avatar.url if user.avatar else '/media/cat.png'  # Provide default
-        })
-    return Response({'detail': 'Not authenticated'}, status=401)
+    user = request.user
+    return Response({
+        'id': user.id,
+        'email': user.email,
+        'username': user.username,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'bio': user.bio,
+        'avatar': request.build_absolute_uri(user.avatar.url) if user.avatar else None,
+    })
 
 
-# views.py
 class CartViewSet(viewsets.ModelViewSet):
     serializer_class = CartSerializer
     permission_classes = [IsAuthenticated]

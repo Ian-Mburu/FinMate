@@ -79,10 +79,10 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # Allauth settings
-ACCOUNT_AUTHENTICATION_METHOD = 'username_email'  # Allows both username and email
+ACCOUNT_AUTHENTICATION_METHOD = 'email'  # Allows both username and email
 ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = 'optional'
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False
 
 
 JWT_AUTH = {
@@ -105,11 +105,13 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'USER_ID_FIELD': 'email',
+    'USER_ID_CLAIM': 'email'
 }
 
 

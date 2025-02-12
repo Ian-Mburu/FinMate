@@ -3,7 +3,7 @@ from .models import CustomUser , Product, Cart, CartItem, Wishlist, Order, Order
 
 @admin.register(CustomUser )
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'name', 'is_staff')
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff') 
     search_fields = ('email', 'username')
     ordering = ('email',)
 

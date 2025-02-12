@@ -7,11 +7,13 @@ from django.contrib.auth import get_user_model
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
-        # Validate the user credentials
         data = super().validate(attrs)
-        # Add custom user details to the response
-        data['id'] = self.user.id
-        data['username'] = self.user.username  # Add username to the response
+        # Add custom claims
+        data.update({
+            'id': self.user.id,
+            'username': self.user.username,
+            'email': self.user.email
+        })
         return data
 
     
@@ -95,7 +97,7 @@ class WishlistSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wishlist
         fields = ['id', 'products', 'product_id']
-        read_only_fields = ['id']
+        read_only_fields = ['id', 'products']
 
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
