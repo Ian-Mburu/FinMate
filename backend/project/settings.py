@@ -53,21 +53,23 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',  # SessionMiddleware must come before AuthenticationMiddleware
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware',  # Keep allauth middleware last
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:3000",
-    "http://localhost:8000",  # Add this
-    "http://127.0.0.1:8000",  # Add this
+    "http://localhost:8000",
+    "http://localhost:8080",  # Add this
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1:8080"  # Add this
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -116,7 +118,6 @@ SIMPLE_JWT = {
 
 
 
-AUTH_USER_MODEL = 'app.CustomUser'
 
 SITE_ID = 1
 

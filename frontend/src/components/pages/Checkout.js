@@ -37,7 +37,7 @@ const CheckoutPage = () => {
     };
 
     return (
-        <div className="checkout-container">
+        <div style={{marginTop: "100px", color: "#fff"}} className="checkout-container">
             <h2>Checkout</h2>
             <form onSubmit={handleSubmit} className="checkout-form">
                 <div className="form-group">

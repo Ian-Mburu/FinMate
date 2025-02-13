@@ -30,7 +30,7 @@ const OrderConfirmationPage = () => {
     if (loading) return <div className="loading">Loading order details...</div>;
 
     return (
-        <div className="order-confirmation">
+        <div style={{marginTop: "100px", color: "#fff"}} className="order-confirmation">
             <h2>Order Confirmation #{order.id}</h2>
             <div className="order-details">
                 <p>Status: {order.status}</p>

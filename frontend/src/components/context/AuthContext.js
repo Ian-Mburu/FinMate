@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
     const refreshToken = async () => {
         try {
             const refresh = localStorage.getItem('refresh_token');
-            if (!refresh) throw new Error("No refresh token found");
+            if (!refreshToken) throw new Error("No refresh token found");
 
             const response = await axios.post('http://localhost:8000/api/token/refresh/', { refresh });
             localStorage.setItem('access_token', response.data.access);

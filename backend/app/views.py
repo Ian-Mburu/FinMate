@@ -5,7 +5,6 @@ from django.http import JsonResponse
 from .models import Product, CustomUser, Wishlist, Cart, CartItem, Order
 from rest_framework.permissions import IsAuthenticated # type: ignore
 from .serializers import ProductSerializer, CustomUserSerializer, CartSerializer,CartAddItemSerializer, WishlistSerializer, OrderSerializer 
-from .permissions import IsOwnerOrReadOnly
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.views import TokenObtainPairView # type: ignore
 from .serializers import CustomTokenObtainPairSerializer
@@ -15,6 +14,8 @@ from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication  
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework_simplejwt.views import TokenRefreshView
+
 
 
 
@@ -42,13 +43,19 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         })
         return data
 
+class CustomTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        if response.status_code == 401:
+            # Handle invalid token case
+            return Response({"error": "Invalid or expired refresh token"}, status=401)
+        return response
 
 class ProductsView(viewsets.ModelViewSet):
     queryset = Product.objects.all().order_by('-title')
     serializer_class = ProductSerializer
     permission_classes = (
         permissions.IsAuthenticatedOrReadOnly,
-        IsOwnerOrReadOnly
     )
 
     def create(self, request, *args, **kwargs):
@@ -197,9 +204,7 @@ class WishlistViewSet(viewsets.ModelViewSet):
         
     @action(detail=False, methods=['get'])
     def mine(self, request):
-        wishlist = Wishlist.objects.filter(user=request.user).first()
-        if not wishlist:
-            return Response({"detail": "Wishlist not found"}, status=404)
+        wishlist, created = Wishlist.objects.get_or_create(user=request.user)
         serializer = self.get_serializer(wishlist)
         return Response(serializer.data)
 

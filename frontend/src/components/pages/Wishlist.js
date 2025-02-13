@@ -13,10 +13,10 @@ const WishlistPage = () => {
     useEffect(() => {
         const fetchWishlist = async () => {
             try {
-                console.log("Fetching wishlist with token:", user.accessToken); // Debug log
+                console.log("Fetching wishlist with token:", user?.accessToken);
                 const response = await axios.get('http://localhost:8000/api/wishlist/mine/', {
                     headers: { 
-                        Authorization: `Bearer ${user.accessToken}`
+                        Authorization: `Bearer ${user?.accessToken}`
                     }
                 });
                 
@@ -25,11 +25,10 @@ const WishlistPage = () => {
                 setLoading(false);
             } catch (error) {
                 console.error('Wishlist fetch error:', error);
+                setLoading(false);
                 if (error.response?.status === 401) {
-                    console.log("Unauthorized access, logging out..."); // Debug log
                     logout();
                 }
-                setLoading(false);
             }
         };
     
@@ -37,7 +36,7 @@ const WishlistPage = () => {
             if (user?.accessToken) {
                 fetchWishlist();
             } else {
-                console.log("User  not authenticated, redirecting to login..."); // Debug log
+                console.log("Redirecting to login");
                 navigate('/login');
             }
         }

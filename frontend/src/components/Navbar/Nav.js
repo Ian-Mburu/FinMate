@@ -14,41 +14,39 @@ const Nav = () => {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
 
-    // Nav.jsx
     useEffect(() => {
-    const fetchCounts = async () => {
-        if (!user) {
-            setCartCount(0);
-            setWishlistCount(0);
-            return;
-        }
-
-        try {
-            const token = localStorage.getItem('access_token');
-            const cartRes = await axios.get('/api/cart/', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            // Handle array response structure
-            setCartCount(cartRes.data.items?.length || 0);
-
-            const wishRes = await axios.get('http://localhost:8000/api/wishlist/', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            setWishlistCount(wishRes.data?.products?.length || 0);
-        } catch (error) {
-            console.error('Count fetch error:', error);
-            if (error.response?.status === 401) {
-                logout();
+        const fetchCounts = async () => {
+            if (!user) return;
+    
+            try {
+                const token = localStorage.getItem('access_token');
+                
+                // Cart request
+                const cartRes = await axios.get('http://localhost:8000/api/cart/', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                
+                // Wishlist request
+                const wishRes = await axios.get('http://localhost:8000/api/wishlist/mine/', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+    
+                setCartCount(cartRes.data?.items?.length || 0);
+                setWishlistCount(wishRes.data?.products?.length || 0);
+            } catch (error) {
+                console.error('Count fetch error:', error);
+                if (error.response?.status === 401) {
+                    logout();
+                }
             }
-        }
-    };
-
-    if (user) {
-        fetchCounts();
-        const interval = setInterval(fetchCounts, 300000); // Refresh every 5 minutes
+        };
+    
+        fetchCounts(); // Initial fetch
+        
+        const interval = setInterval(fetchCounts, 300000); // Fetch every 5 minutes
+        
         return () => clearInterval(interval);
-    }
-}, [user]);
+    }, [user, logout]);
 
     const handleLogout = () => {
         logout();
